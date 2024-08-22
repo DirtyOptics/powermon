@@ -1,0 +1,16 @@
+{
+    "network": {
+        "mac": [0, 1, 2, 3, 4, 5],
+        "ip": [192, 168, 50, 100],
+        "subnet": [255, 255, 255, 0],
+        "gateway": [192, 168, 50, 1],
+        "dns": [8, 8, 8, 8]
+    },
+    "postgresql": {
+        "url": "http://your_postgrest_server_endpoint/power_data"
+    },
+    "device": {
+        "device_id": "monitor_01",
+        "location": "office"
+    }
+}
