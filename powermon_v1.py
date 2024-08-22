@@ -1,4 +1,4 @@
-import time
+import json
 import board
 import busio
 import digitalio
@@ -7,20 +7,22 @@ from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 import adafruit_requests as requests
 import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
 
-# External configuration for network settings
-NETWORK_CONFIG = {
-    "mac": (0x00, 0x01, 0x02, 0x03, 0x04, 0x05),
-    "ip": (192, 168, 50, 100),
-    "subnet": (255, 255, 255, 0),
-    "gateway": (192, 168, 50, 1),
-    "dns": (8, 8, 8, 8)
-}
+# Load configuration from config.json
+with open("/config.json", "r") as f:
+    config = json.load(f)
 
-# PostgREST API endpoint (replace with your actual endpoint)
-POSTGREST_URL = "http://your_postgrest_server_endpoint/power_data"
+# Extract configuration items
+network_config = config['network']
+postgresql_url = config['postgresql']['url']
+device_id = config['device']['device_id']
+location = config['device']['location']
 
-# Unique device identifier
-DEVICE_ID = "monitor_01"  # Change this for each device
+# Network Configuration
+mac = tuple(network_config['mac'])
+ip_address = tuple(network_config['ip'])
+subnet_mask = tuple(network_config['subnet'])
+gateway_address = tuple(network_config['gateway'])
+dns_server = tuple(network_config['dns'])
 
 # SPI0 and Reset pin setup
 SPI0_SCK = board.GP18
@@ -49,10 +51,10 @@ spi_bus = busio.SPI(SPI0_SCK, MOSI=SPI0_TX, MISO=SPI0_RX)
 ethernetRst.value = False
 time.sleep(1)
 ethernetRst.value = True
-eth = WIZNET5K(spi_bus, cs, is_dhcp=False, mac=NETWORK_CONFIG["mac"])
+eth = WIZNET5K(spi_bus, cs, is_dhcp=False, mac=mac)
 
 # Set network configuration
-eth.ifconfig = (NETWORK_CONFIG["ip"], NETWORK_CONFIG["subnet"], NETWORK_CONFIG["gateway"], NETWORK_CONFIG["dns"])
+eth.ifconfig = (ip_address, subnet_mask, gateway_address, dns_server)
 
 # Initialize requests object
 requests.set_socket(socket, eth)
@@ -66,14 +68,14 @@ print("My IP address is:", eth.pretty_ip(eth.ip_address))
 def send_power_data(device_id, voltage, current, power, timestamp):
     data = {
         "device_id": device_id,
-        "location": "office",
+        "location": location,
         "voltage": voltage,
         "current": current,
         "power": power,
         "timestamp": timestamp
     }
     try:
-        response = requests.post(POSTGREST_URL, json=data)
+        response = requests.post(postgresql_url, json=data)
         print("Sent data to PostgREST:", response.text)
         response.close()
     except Exception as e:
@@ -94,7 +96,7 @@ while True:
         print("Power: {:.2f} mW".format(power * 1000))
 
         # Send data to PostgREST
-        send_power_data(DEVICE_ID, voltage, current, power, timestamp)
+        send_power_data(device_id, voltage, current, power, timestamp)
 
     except Exception as e:
         print("Error:", e)
