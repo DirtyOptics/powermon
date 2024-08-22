@@ -26,4 +26,5 @@ Decouples Application Logic: Using an API like PostgREST allows you to manage yo
 
 
 #### Product Links:
+https://docs.wiznet.io/Product/iEthernet/W5500/w5500-evb-pico
 https://wiznet.io/products/evaluation-boards/w5500-evb-pico
