@@ -6,10 +6,9 @@ import adafruit_ina260
 from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 import adafruit_requests as requests
 import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
-
-# Load configuration from config.json
 import json
 
+# Load configuration from config.json
 with open("/config.json", "r") as f:
     config = json.load(f)
 
@@ -20,6 +19,7 @@ device_id = config['device']['device_id']
 location = config['device']['location']
 
 # Network Configuration
+dhcp_enabled = network_config.get('dhcp_enabled', True)  # Default to True if not specified
 mac = tuple(network_config['mac'])
 static_ip = tuple(network_config['ip'])
 subnet_mask = tuple(network_config['subnet'])
@@ -54,16 +54,22 @@ ethernetRst.value = False
 time.sleep(1)
 ethernetRst.value = True
 
-# Try to initialize ethernet interface with DHCP
-eth = WIZNET5K(spi_bus, cs, is_dhcp=True, mac=mac)
+if dhcp_enabled:
+    # Try to initialize ethernet interface with DHCP
+    eth = WIZNET5K(spi_bus, cs, is_dhcp=True, mac=mac)
 
-# Check if DHCP was successful by verifying the assigned IP address
-if eth.pretty_ip(eth.ip_address) == "0.0.0.0":
-    # DHCP failed, so set a static IP configuration
-    print("DHCP failed, falling back to static IP.")
-    eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
+    # Check if DHCP was successful by verifying the assigned IP address
+    if eth.pretty_ip(eth.ip_address) == "0.0.0.0":
+        # DHCP failed, so set a static IP configuration
+        print("DHCP failed, falling back to static IP.")
+        eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
+    else:
+        print("DHCP assigned IP:", eth.pretty_ip(eth.ip_address))
 else:
-    print("DHCP assigned IP:", eth.pretty_ip(eth.ip_address))
+    # Always use static IP configuration
+    eth = WIZNET5K(spi_bus, cs, is_dhcp=False, mac=mac)
+    eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
+    print("Static IP configuration used:", eth.pretty_ip(eth.ip_address))
 
 # Initialize requests object
 requests.set_socket(socket, eth)
