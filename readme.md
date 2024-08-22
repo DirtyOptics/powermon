@@ -1,8 +1,8 @@
 # Powermon v1
 
+#### Workflow:
 <kbd>Power Mon</kbd> -> <kbd>PPostgREST</kbd> -> <kbd>WPostgrSQL</kbd> -> <kbd>Grafana</kbd>
 
-#### Workflow:
 Power Monitor: Collects data (voltage, current, power) using the W5500-EVB-Pico and INA260 sensor.
 PostgREST API: The Power Monitor sends this data via HTTP POST requests to a PostgREST endpoint.
 PostgreSQL: PostgREST handles the database interactions, inserting the received data into the appropriate table in PostgreSQL.
