@@ -3,10 +3,9 @@ import board
 import busio
 import digitalio
 import adafruit_ina260
+from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 import adafruit_requests as requests
 import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
-import psycopg2
-from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 
 # External configuration for network settings
 NETWORK_CONFIG = {
@@ -17,14 +16,8 @@ NETWORK_CONFIG = {
     "dns": (8, 8, 8, 8)
 }
 
-# PostgreSQL configuration
-POSTGRES_CONFIG = {
-    "dbname": "powermonitor",
-    "user": "your_username",
-    "password": "your_password",
-    "host": "your_host_ip",
-    "port": "5432"
-}
+# PostgREST API endpoint (replace with your actual endpoint)
+POSTGREST_URL = "http://your_postgrest_server_endpoint/power_data"
 
 # Unique device identifier
 DEVICE_ID = "monitor_01"  # Change this for each device
@@ -69,44 +62,39 @@ print("Chip Version:", eth.chip)
 print("MAC Address:", [hex(i) for i in eth.mac_address])
 print("My IP address is:", eth.pretty_ip(eth.ip_address))
 
-# Setup PostgreSQL connection
-def connect_postgres():
-    conn = psycopg2.connect(
-        dbname=POSTGRES_CONFIG["dbname"],
-        user=POSTGRES_CONFIG["user"],
-        password=POSTGRES_CONFIG["password"],
-        host=POSTGRES_CONFIG["host"],
-        port=POSTGRES_CONFIG["port"]
-    )
-    return conn
-
-# Function to insert power data into PostgreSQL
-def insert_power_data(conn, device_id, voltage, current, power):
-    with conn.cursor() as cursor:
-        cursor.execute("""
-            INSERT INTO power_data (device_id, location, voltage, current, power)
-            VALUES (%s, %s, %s, %s, %s);
-        """, (device_id, "office", voltage, current, power))
-        conn.commit()
+# Function to send power data to PostgREST (and then to PostgreSQL)
+def send_power_data(device_id, voltage, current, power, timestamp):
+    data = {
+        "device_id": device_id,
+        "location": "office",
+        "voltage": voltage,
+        "current": current,
+        "power": power,
+        "timestamp": timestamp
+    }
+    try:
+        response = requests.post(POSTGREST_URL, json=data)
+        print("Sent data to PostgREST:", response.text)
+        response.close()
+    except Exception as e:
+        print("Failed to send data to PostgREST:", e)
 
 # Main loop
-conn = connect_postgres()
-
 while True:
     try:
         # Read sensor values
         voltage = ina260.voltage
         current = ina260.current
         power = ina260.power
+        timestamp = time.time()  # Current time in seconds since the epoch
 
         # Print readings
         print("Voltage: {:.2f} V".format(voltage))
         print("Current: {:.2f} mA".format(current * 1000))
         print("Power: {:.2f} mW".format(power * 1000))
 
-        # Insert data into PostgreSQL
-        insert_power_data(conn, DEVICE_ID, voltage, current, power)
-        print("Sent data to PostgreSQL")
+        # Send data to PostgREST
+        send_power_data(DEVICE_ID, voltage, current, power, timestamp)
 
     except Exception as e:
         print("Error:", e)
