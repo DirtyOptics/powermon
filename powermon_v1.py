@@ -14,7 +14,7 @@ with open("/config.json", "r") as f:
 
 # Extract configuration items
 network_config = config['network']
-postgresql_url = config['postgresql']['url']
+postgrest_url = config['postgresql']['url']  # Renamed for clarity
 device_id = config['device']['device_id']
 location = config['device']['location']
 
@@ -90,7 +90,7 @@ def send_power_data(device_id, voltage, current, power, timestamp):
         "timestamp": timestamp
     }
     try:
-        response = requests.post(postgresql_url, json=data)
+        response = requests.post(postgrest_url, json=data)
         print("Sent data to PostgREST:", response.text)
         response.close()
     except Exception as e:
