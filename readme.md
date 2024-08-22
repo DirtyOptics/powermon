@@ -1,4 +1,4 @@
-# Powermon v1
+# PowerMon v1
 
 #### Workflow:
 <kbd>Power Mon</kbd> -> <kbd>PPostgREST</kbd> -> <kbd>WPostgrSQL</kbd> -> <kbd>Grafana</kbd>
