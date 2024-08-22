@@ -23,3 +23,4 @@ Decouples Application Logic: Using an API like PostgREST allows you to manage yo
 
 #### Source Links:
 https://wiznet.io/products/evaluation-boards/w5500-evb-pico
+https://circuitpython.org/board/wiznet_w5500_evb_pico/
