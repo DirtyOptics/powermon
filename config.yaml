@@ -1,13 +1,13 @@
 {
     "network": {
-        "mac": [0, 1, 2, 3, 4, 5],
+        "mac": [0, 1, 2, 3, 4, 5],    #IMPORTANT! Replace with your generated MAC.
         "ip": [192, 168, 50, 100],
         "subnet": [255, 255, 255, 0],
         "gateway": [192, 168, 50, 1],
         "dns": [8, 8, 8, 8]
     },
     "postgresql": {
-        "url": "http://your_postgrest_server_endpoint/power_data"
+        "url": "http://your_postgrest_server_endpoint/power_data"    # This is the path to the PostGREST API not the PostgreSQL DB.
     },
     "device": {
         "device_id": "monitor_01",
