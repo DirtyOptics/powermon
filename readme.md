@@ -8,6 +8,10 @@
 - PostgreSQL: PostgREST handles the database interactions, inserting the received data into the appropriate table in PostgreSQL.
 - Grafana: Grafana connects directly to PostgreSQL, querying the stored data to generate visualizations.
 
+#### Circuit Python
+Tested with v 9.1.1
+https://circuitpython.org/board/wiznet_w5500_evb_pico/
+
 #### Why Use PostgREST?
 Simplifies CircuitPython Code: CircuitPython doesn’t natively support PostgreSQL. By using PostgREST, you can send HTTP requests, which CircuitPython supports, instead of trying to establish a direct database connection.
 Decouples Application Logic: Using an API like PostgREST allows you to manage your database interactions separately, which can be beneficial for maintenance, scalability, and security.
@@ -21,6 +25,5 @@ Decouples Application Logic: Using an API like PostgREST allows you to manage yo
 ![image](https://github.com/user-attachments/assets/1290b31a-7428-418c-a1e6-01e867cbc7c5)
 
 
-#### Source Links:
+#### Product Links:
 https://wiznet.io/products/evaluation-boards/w5500-evb-pico
-https://circuitpython.org/board/wiznet_w5500_evb_pico/
