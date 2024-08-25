@@ -8,7 +8,7 @@
         "dns": [8, 8, 8, 8]
     },
     "influxdb": { 
-        "url": "http://<influxdb_server>:8086/write?db=<database_name>",
+        "url": "http://<influxdb_server>:8086/api/v2/write?org=<your_org>&bucket=<your_bucket>&precision=s",
         "token": "your_influxdb_token_here"
     },
     "device": {
