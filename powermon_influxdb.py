@@ -15,6 +15,7 @@ with open("/config.json", "r") as f:
 # Extract configuration items
 network_config = config['network']
 influxdb_url = config['influxdb']['url']  # Updated to use InfluxDB URL
+influxdb_token = config['influxdb']['token']  # New: token for authentication
 device_id = config['device']['device_id']
 location = config['device']['location']
 
@@ -86,8 +87,13 @@ def send_power_data_to_influxdb(device_id, voltage, current, power, timestamp):
         device_id, location, voltage, current, power, int(timestamp)
     )
     
+    headers = {
+        "Authorization": f"Token {influxdb_token}",
+        "Content-Type": "application/octet-stream"
+    }
+    
     try:
-        response = requests.post(influxdb_url, data=data)
+        response = requests.post(influxdb_url, headers=headers, data=data)
         print("Sent data to InfluxDB:", response.text)
         response.close()
     except Exception as e:
