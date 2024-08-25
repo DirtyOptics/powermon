@@ -5,7 +5,7 @@ import digitalio
 import adafruit_ina260
 from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 import adafruit_requests as requests
-import adafruit_wiznet5k.adafruit_wiznet5k_socketpool as socketpool  # Corrected import
+import adafruit_wiznet5k.adafruit_wiznet5k_socketpool as socketpool  # Correct import
 import json
 
 # Load configuration from config.json
@@ -15,13 +15,13 @@ with open("/config.json", "r") as f:
 # Extract configuration items
 network_config = config['network']
 influxdb_url = config['influxdb']['url']  # Updated to use InfluxDB URL
-influxdb_token = config['influxdb']['token']  # New: token for authentication
+influxdb_token = config['influxdb']['token']  # Token for authentication
 device_id = config['device']['device_id']
 location = config['device']['location']
 
 # Network Configuration
-dhcp_enabled = network_config.get('dhcp_enabled', True)  # Default to True if not specified
-mac = tuple(network_config['mac'])
+dhcp_enabled = network_config.get('dhcp_enabled', False)  # Static IP is configured
+mac = network_config['mac']  # Use MAC address directly from the config as a string
 static_ip = tuple(network_config['ip'])
 subnet_mask = tuple(network_config['subnet'])
 gateway_address = tuple(network_config['gateway'])
@@ -74,7 +74,7 @@ else:
 
 # Initialize requests object with socketpool
 pool = socketpool.SocketPool(eth)  # Create a socket pool
-requests.set_socket(pool, eth)
+requests_session = requests.Session(pool, eth)  # Correct way to initialize requests
 
 # Serial print ethernet values
 print("Chip Version:", eth.chip)
@@ -94,11 +94,13 @@ def send_power_data_to_influxdb(device_id, voltage, current, power, timestamp):
     }
     
     try:
-        response = requests.post(influxdb_url, headers=headers, data=data)
+        response = requests_session.post(influxdb_url, headers=headers, data=data)  # Use requests_session for HTTP requests
         print("Sent data to InfluxDB:", response.text)
         response.close()
     except Exception as e:
         print("Failed to send data to InfluxDB:", e)
+        # Additional debugging information
+        print(f"Error type: {type(e).__name__}, Arguments: {e.args}")
 
 # Main loop
 while True:
