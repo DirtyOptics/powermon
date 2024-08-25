@@ -1,14 +1,14 @@
 {
     "network": {
-        "dhcp_enabled": true,  // Set to true to use DHCP, false to always use static IP
-        "mac": [2, 0, 0, 0, 0, 1],  // Ensure each device has a unique MAC address
-        "ip": [192, 168, 50, 100],  // Static IP configuration
+        "dhcp_enabled": true,
+        "mac": [2, 0, 0, 0, 0, 1],
+        "ip": [192, 168, 50, 100],
         "subnet": [255, 255, 255, 0],
         "gateway": [192, 168, 50, 1],
         "dns": [8, 8, 8, 8]
     },
-    "postgrest": {  // Renamed from "postgresql" to "postgrest" for clarity
-        "url": "http://your_postgrest_server_endpoint/power_data"
+    "influxdb": { 
+        "url": "http://<influxdb_server>:8086/write?db=<database_name>"
     },
     "device": {
         "device_id": "monitor_01",
