@@ -11,7 +11,7 @@
 #### Circuit Python
 - Testing with v 9.1.2
 - Lib 9.x.x
-https://circuitpython.org/board/wiznet_w5500_evb_pico/
+- https://circuitpython.org/board/wiznet_w5500_evb_pico/
 
 #### Why Use PostgREST?
 Simplifies CircuitPython Code: CircuitPython doesn’t natively support PostgreSQL. By using PostgREST, you can send HTTP requests, which CircuitPython supports, instead of trying to establish a direct database connection.
