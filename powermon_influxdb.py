@@ -96,28 +96,27 @@ print("Chip Version:", eth.chip)
 print("MAC Address:", [hex(i) for i in eth.mac_address])
 print("My IP address is:", eth.pretty_ip(eth.ip_address))
 
-# Function to send power data to InfluxDB
-def send_power_data_to_influxdb(device_id, voltage, current, power, timestamp):
-    # Convert timestamp to nanoseconds
-    timestamp_ns = int(timestamp * 1e9)
-
-    # Format data in InfluxDB line protocol
-    data = "power_data,device_id={} location=\"{}\" voltage={:.2f},current={:.2f},power={:.2f} {}".format(
-        device_id, location, voltage, current, power, timestamp_ns
+# Function to send power data to InfluxDB with basic success/failure response
+def send_power_data_to_influxdb(device_id, voltage, current, power):
+    # Correctly format data in InfluxDB line protocol without timestamp
+    data = "power_data,device_id={},location={} voltage={:.2f},current={:.2f},power={:.2f}".format(
+        device_id, location, voltage, current, power
     )
     
     headers = {
         "Authorization": f"Token {influxdb_token}",
         "Content-Type": "application/octet-stream"
     }
-    
+
     try:
-        response = requests_session.post(influxdb_url, headers=headers, data=data)  # Use requests_session for HTTP requests
-        print("Sent data to InfluxDB:", response.text)
+        response = requests_session.post(influxdb_url, headers=headers, data=data, timeout=20)  # Set timeout to 20 seconds
+        if response.status_code == 204:
+            print("Data successfully sent to InfluxDB.")
+        else:
+            print(f"Failed to send data to InfluxDB. Status Code: {response.status_code}, Response: {response.text}")
         response.close()
     except Exception as e:
         print("Failed to send data to InfluxDB:", e)
-        # Additional debugging information
         print(f"Error type: {type(e).__name__}, Arguments: {e.args}")
 
 # Main loop
@@ -127,7 +126,6 @@ while True:
         voltage = ina260.voltage
         current = ina260.current
         power = ina260.power
-        timestamp = time.time()  # Current time in seconds since the epoch
 
         # Print readings
         print("Voltage: {:.2f} V".format(voltage))
@@ -135,7 +133,7 @@ while True:
         print("Power: {:.2f} mW".format(power * 1000))
 
         # Send data to InfluxDB
-        send_power_data_to_influxdb(device_id, voltage, current, power, timestamp)
+        send_power_data_to_influxdb(device_id, voltage, current, power)
 
     except Exception as e:
         print("Error:", e)
