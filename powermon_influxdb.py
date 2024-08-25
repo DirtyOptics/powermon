@@ -99,8 +99,8 @@ print("My IP address is:", eth.pretty_ip(eth.ip_address))
 # Function to send power data to InfluxDB
 def send_power_data_to_influxdb(device_id, voltage, current, power, timestamp):
     # Format data in InfluxDB line protocol
-    data = "power_data,device_id={} location={},voltage={:.2f},current={:.2f},power={:.2f} {}".format(
-        device_id, location, voltage, current, power, int(timestamp)
+    data = "power_data,device_id={} location=\"{}\" voltage={:.2f},current={:.2f},power={:.2f} {}".format(
+        device_id, location, voltage, current, power, int(timestamp * 1e9)
     )
     
     headers = {
