@@ -4,3 +4,4 @@
 - <kbd>adafruit_requests</kbd> This library is used to make HTTP requests. It works with the WIZnet5k Ethernet modules.
 - <kbd>adafruit_register</kbd>
 - <kbd>adafruit_ticks</kbd>
+- <kbd>adafruit_connection_manager</kbd>
