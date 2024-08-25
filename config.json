@@ -9,7 +9,7 @@
     },
     "influxdb": { 
         "url": "http://<influxdb_server>:8086/write?db=<database_name>",
-        "token": "your_influxdb_token_here"  // Add your token here
+        "token": "your_influxdb_token_here"
     },
     "device": {
         "device_id": "monitor_01",
