@@ -6,6 +6,7 @@
 - Power Monitor: Collects data (voltage, current, power) using the W5500-EVB-Pico and INA260 sensor.
 - PostgREST API: The Power Monitor sends this data via HTTP POST requests to a PostgREST endpoint.
 - PostgreSQL: PostgREST handles the database interactions, inserting the received data into the appropriate table in PostgreSQL.
+- InfluxDB v2: Time series database suitable for IoT time related input.
 - Grafana: Grafana connects directly to PostgreSQL, querying the stored data to generate visualizations.
 
 #### Circuit Python
