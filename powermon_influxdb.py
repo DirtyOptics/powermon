@@ -5,7 +5,7 @@ import digitalio
 import adafruit_ina260
 from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 import adafruit_requests as requests
-import adafruit_wiznet5k.adafruit_wiznet5k_socket as socket
+import adafruit_wiznet5k.adafruit_wiznet5k_socketpool as socketpool  # Corrected import
 import json
 
 # Load configuration from config.json
@@ -72,8 +72,9 @@ else:
     eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
     print("Static IP configuration used:", eth.pretty_ip(eth.ip_address))
 
-# Initialize requests object
-requests.set_socket(socket, eth)
+# Initialize requests object with socketpool
+pool = socketpool.SocketPool(eth)  # Create a socket pool
+requests.set_socket(pool, eth)
 
 # Serial print ethernet values
 print("Chip Version:", eth.chip)
