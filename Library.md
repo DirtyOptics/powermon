@@ -3,3 +3,4 @@
 - <kbd>adafruit_wiznet5k</kbd> This library provides support for the W5500 Ethernet module.
 - <kbd>adafruit_requests</kbd> This library is used to make HTTP requests. It works with the WIZnet5k Ethernet modules.
 - <kbd>adafruit_register</kbd>
+- <kbd>adafruit_ticks</kbd>
