@@ -5,7 +5,7 @@ import digitalio
 import adafruit_ina260
 from adafruit_wiznet5k.adafruit_wiznet5k import WIZNET5K
 import adafruit_requests as requests
-import adafruit_wiznet5k.adafruit_wiznet5k_socketpool as socketpool  # Correct import
+import adafruit_wiznet5k.adafruit_wiznet5k_socketpool as socketpool
 import json
 
 # Load configuration from config.json
@@ -20,7 +20,7 @@ device_id = config['device']['device_id']
 location = config['device']['location']
 
 # Network Configuration
-dhcp_enabled = network_config.get('dhcp_enabled', False)  # Static IP is configured
+dhcp_enabled = network_config.get('dhcp_enabled', True)  # Default to True if not specified
 mac = network_config['mac']  # Use MAC address directly from the config as a string
 static_ip = tuple(network_config['ip'])
 subnet_mask = tuple(network_config['subnet'])
@@ -55,22 +55,37 @@ ethernetRst.value = False
 time.sleep(1)
 ethernetRst.value = True
 
-if dhcp_enabled:
-    # Try to initialize ethernet interface with DHCP
-    eth = WIZNET5K(spi_bus, cs, is_dhcp=True, mac=mac)
+# Function to initialize Ethernet with error handling
+def initialize_ethernet():
+    while True:
+        try:
+            if dhcp_enabled:
+                print("Trying to initialize Ethernet with DHCP...")
+                eth = WIZNET5K(spi_bus, cs, is_dhcp=True, mac=mac)
+                if eth.pretty_ip(eth.ip_address) == "0.0.0.0":
+                    # DHCP failed, wait and retry
+                    print("DHCP failed. Retrying...")
+                    time.sleep(5)
+                    continue
+                else:
+                    print("DHCP assigned IP:", eth.pretty_ip(eth.ip_address))
+            else:
+                # Always use static IP configuration
+                eth = WIZNET5K(spi_bus, cs, is_dhcp=False, mac=mac)
+                eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
+                print("Static IP configuration used:", eth.pretty_ip(eth.ip_address))
 
-    # Check if DHCP was successful by verifying the assigned IP address
-    if eth.pretty_ip(eth.ip_address) == "0.0.0.0":
-        # DHCP failed, so set a static IP configuration
-        print("DHCP failed, falling back to static IP.")
-        eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
-    else:
-        print("DHCP assigned IP:", eth.pretty_ip(eth.ip_address))
-else:
-    # Always use static IP configuration
-    eth = WIZNET5K(spi_bus, cs, is_dhcp=False, mac=mac)
-    eth.ifconfig = (static_ip, subnet_mask, gateway_address, dns_server)
-    print("Static IP configuration used:", eth.pretty_ip(eth.ip_address))
+            # If no exception occurred, break out of the loop
+            break
+
+        except ConnectionError:
+            print("Ethernet connection is down. Retrying in 5 seconds...")
+            time.sleep(5)
+
+    return eth
+
+# Initialize Ethernet with retry logic
+eth = initialize_ethernet()
 
 # Initialize requests object with socketpool
 pool = socketpool.SocketPool(eth)  # Create a socket pool
