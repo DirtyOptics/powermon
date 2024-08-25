@@ -8,7 +8,8 @@
         "dns": [8, 8, 8, 8]
     },
     "influxdb": { 
-        "url": "http://<influxdb_server>:8086/write?db=<database_name>"
+        "url": "http://<influxdb_server>:8086/write?db=<database_name>",
+        "token": "your_influxdb_token_here"  // Add your token here
     },
     "device": {
         "device_id": "monitor_01",
