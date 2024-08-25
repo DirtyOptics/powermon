@@ -9,8 +9,8 @@
 - Grafana: Grafana connects directly to PostgreSQL, querying the stored data to generate visualizations.
 
 #### Circuit Python
-Testing with v 9.1.2
-Lib 9.x.x
+- Testing with v 9.1.2
+- Lib 9.x.x
 https://circuitpython.org/board/wiznet_w5500_evb_pico/
 
 #### Why Use PostgREST?
